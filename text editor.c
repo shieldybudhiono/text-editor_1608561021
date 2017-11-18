@@ -3,233 +3,190 @@
 
 typedef struct data
 {
-    char kota[100],nama[20];
-    int berat;
-    int id;
+    char huruf;
     struct data *next,*prev;
-}barang;
+}teks;
 
-int i,n=0,ID,r=0,x;
-char y;
-barang *head,*tail,*themp;
-
-void header()
-{
-    system("cls");
-    fflush(stdin);
-    printf("\t\t*********************************\n");
-    printf("\t\tPROGRAM ANTRIAN PENGIRIMAN BARANG\n");
-    printf("\t\t*********************************\n\n");
-}
+teks *head=NULL,*baru,*temp,*tail,*cetak;
+teks *del,*after,*before=NULL;
 
 void tambah()
 {
-        system("cls");
-        header();
-        themp = (barang *) malloc(sizeof(barang));
-        themp->id = r+1;
-        printf("ID code : %d\n", themp->id);
-        printf("Nama barang : ");
-        fflush(stdin);
-        gets(themp->nama);
-        printf("Berat barang : ");
-        scanf("%d",&themp->berat);
-        printf("Kota tujuan pegiriman : ");
-        fflush(stdin);
-        gets(themp->kota);
-        themp->next=NULL;
-    if (n==0)
-    {
-        head=themp;
-        tail=themp;
-    }
-    else
-    {
-        tail->next = themp;
-        themp->prev = tail;
-        tail=themp;
-    }
-    r++;
-    n++;
-    printf("\nApakah anda ingin menambah data lagi ? Y/T : ");
+    baru=(teks*)malloc(sizeof(teks));
     fflush(stdin);
-    scanf("%c", &y);
-    if(y == 'y' || y == 'Y')
+    printf("ketik 1 karakter\t:");
+    scanf("%c",&baru->huruf);
+    baru->next=NULL;
+    if (head==NULL)
     {
-        tambah();
+        head=baru;
+        tail=baru;
+        temp=baru;
+        head->next=NULL;
+        before=(teks*)malloc(sizeof(teks));
+        head->prev=before;
+        before->next=head;
+        before->prev=NULL;
+    }
+    else if (temp->next==NULL)
+    {
+        temp->next=baru;
+        tail=baru;
+        tail->prev=temp;
+        temp=baru;
+    }
+    else if (temp->prev==NULL)
+    {
+        head->prev=baru;
+        before->next=baru;
+        baru->prev=before;
+        baru->next=head;
+        head=baru;
+        temp=head;
+        before->prev=NULL;
+
     }
     else
     {
-        main();
+        after=temp->next;
+        temp->next=baru;
+        after->prev=baru;
+        baru->next=after;
+        baru->prev=temp;
+        temp=baru;
     }
+    printf("\n");
+    system("pause");
 }
+
 void hapus()
 {
-    header();
-    system("cls");
-    if (n==0)
+    if(temp==before)
     {
-        printf("\n\nData Kosong\n\n");
+        printf("\ntidak ada yang dihapus\n");
+    }
+    else if(head==tail)
+    {
+        del=head;
+        temp=before;
+        printf("\nkarakter %c sudah dihapus\n",del->huruf);
+        free(del);
+        head=NULL;
+    }
+    else if(temp->next==NULL)
+    {
+        tail=tail->prev;
+        del=temp;
+        temp=temp->prev;
+        printf("\nkarakter %c sudah dihapus\n",del->huruf);
+        free(del);
+        tail->next=NULL;
+    }
+    else if(temp==head)
+    {
+
+        del=head;
+        temp=before;
+        head=head->next;
+        printf("\nkarakter %c sudah dihapus\n",del->huruf);
+        free(del);
+        temp->next=head;
+        head->prev=before;
     }
     else
     {
-        printf("ID yang ingin dihapus : ");
-        scanf("%d", &ID);
-        themp=head;
-        while(themp->next != NULL)
-        {
-            if(themp->id == ID)
-            {
-                x=1;
-                break;
-            }
-            themp=themp->next;
-        }
-        if(x==0)
-        {
-            printf("Data tidak ditemukan\n\n");
-           system("pause");
-            main();
-        }
-        else
-        {
-            printf("ID code: %d\n", themp->id);
-            printf("Nama barang: %s\n", themp->nama);
-            printf("Berat barang : %d\n", themp->berat);
-            printf("Kota tujuan pegiriman: %s\n", themp->kota);
-
-            if(themp==head && themp==tail)
-            {
-                free(themp);
-            }
-            else if(themp==head)
-            {
-                head=head->next;
-                free(themp);
-                head->prev=NULL;
-            }
-            else if(themp==tail)
-            {
-                tail=tail->prev;
-                themp=tail->next;
-                free(themp);
-                tail->next = NULL;
-            }
-            else
-            {
-                themp->prev->next=themp->next;
-                themp->next->prev = themp->prev;
-                free(themp);
-            }
-        }
-            n--;
-            printf("\n\nData Berhasil di hapus");
-            printf("\n\nApakah anda ingin menghapus data lagi ? Y/T : ");
-            fflush(stdin);
-            scanf("%c", &y);
-            if(y == 'y' || y == 'Y')
-            {
-                hapus();
-            }
-            else
-            {
-                main();
-            }
+        del=temp;
+        temp=temp->prev;
+        del->next->prev=temp;
+        temp->next=del->next;
+        printf("\nkarakter %c sudah dihapus\n",del->huruf);
+        free(del);
     }
-                 system("pause");
+    printf("\n");
+    system("pause");
 }
 
-void tampil()
+void left()
 {
-    themp=head;
-    system("cls");
-    header();
-    printf("No\t\tNama barang\t\tBerat barang\tKota tujuan pengiriman\n");
-    for(i=0;i<n;i++)
+    if(temp==before)
     {
-        printf("%d\t\t%s\t\t\t%d\t\t%s\n",themp->id, themp->nama,themp->berat,themp->kota);
-        themp=themp->next;
-    }
-   system("pause");
-    main();
-}
-
-void edit()
-{
-    printf("Cari ID : ");
-    scanf("%d", &ID);
-    x=0;
-    themp=head;
-    for(i=0;i<n;i++)
-    {
-        if(ID == themp->id)
-        {
-            x=1;
-        }
-        else
-        {
-            themp=themp->next;
-        }
-    }
-
-    if(x==0)
-    {
-        printf("\nData tidak ada\n\n");
-        system("pause");
-        main();
+        printf("\npointer sudah paling kiri\n");
     }
     else
     {
-        themp->id = ID;
-        printf("ID code: %d\n", themp->id);
-        printf("Nama barang: %s\n", themp->nama);
-        printf("Berat barang : %d\n", themp->berat);
-        printf("Kota tujuan pegiriman: %s\n", themp->kota);
-        printf("Ganti data diatas ? Y/T : ");
-        fflush(stdin);
-        scanf("%c", &y);
-        if(y=='y' || y=='Y')
-        {
-            printf("Nama barang : ");
-            fflush(stdin);
-            gets(themp->nama);
-            printf("Berat barang : ");
-            scanf("%d",&themp->berat);
-            printf("Kota tujuan pegiriman : ");
-            fflush(stdin);
-            gets(themp->kota);
-            r=1;
-        }
-        else
-        {
-            main();
-        }
+        printf("\npointer telah digeser ke kiri\n");
+        temp=temp->prev;
     }
+    printf("\n");
+    system("pause");
+}
+
+void right()
+{
+    if(temp==tail)
+    {
+        printf("\npointer sudah paling kanan\n");
+    }
+    else
+    {
+        printf("\npointer telah digeser ke kanan\n");
+        temp=temp->next;
+    }
+    printf("\n");
+    system("pause");
+}
+
+void print()
+{
+    if(head!=NULL)
+    {
+        cetak=head;
+        while(cetak!=NULL)
+        {
+            printf("%c",cetak->huruf);
+            cetak=cetak->next;
+        }
+
+    }
+    else
+    {
+        printf("\n(kosong)\n");
+    }
+    printf("\n");
+    system("pause");
 }
 
 int main()
 {
-   int pil;
-    menu: system("cls");
-    header();
-    printf("Menu : \n");
-    printf("1. Tambah data\n2. Edit data\n3. Hapus data\n4. Tampil data\n5. Keluar\n\n");
-    printf("Pilihan : ");
-    scanf("%d", &pil);
-    switch(pil)
+    int a,i,pilih;
+    fflush(stdin);
+    system("cls");
+    printf("\t\tProgram Mengetik\n");
+    printf("Masukkan jumlah perintah:");
+    scanf("%d",&a);
+    for(i=0;i<a;i++)
     {
-        case 1 : tambah(); break;
-        case 2 : edit(); break;
-        case 3 : hapus(); break;
-        case 4 : tampil(); break;
-        case 5 : printf("Apakah Anda ingin keluar ? Y/T : ");
-                 fflush(stdin);
-                 scanf("%c", &y);
-                 if(y=='y' || y == 'Y')
-                    return 0;
-                 else main();
-        default: main();
-    }
-    getch();
-    return 0;
+        system("cls");
+        fflush(stdin);
+        printf("ke-%d\nMenu\t:\n",i+1);
+        printf("1.insert\n2.delete\n3.shift left\n4.shift right\n5.print\n");
+        printf("pilih\t:");
+        scanf("%d",&pilih);
+        switch(pilih)
+        {
+            case 1:tambah();
+            break;
+            case 2:hapus();
+            break;
+            case 3:left();
+            break;
+            case 4:right();
+            break;
+            case 5: print();
+            break;
+            default : main();
 
+        }
+    }
+    return 0;
+}
